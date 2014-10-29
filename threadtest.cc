@@ -76,6 +76,7 @@ LockThread2(int param)
     printf("L2:3\n");
 }
 
+
 void
 LockTest1()
 {
@@ -89,34 +90,35 @@ LockTest1()
     t->Fork(LockThread2, 0);
 }
 
+
 // acquiring the same lock twice
 void testLockTwice()
 {  
-    printf("Entering LockTest2\n");
-    locktest1 = new Lock("LockTest2");
+    Lock *lock;
+    printf("Creating lock\n");
+    lock = new Lock("test");
 
-    locktest1->Acquire();
-    printf("acquire clock time: 1\n");
-    locktest1->Acquire();
-    printf("acquire clock time: 2\n");
-    printf("leaving locktest2\n");
+    lock->Acquire();
+    printf("Acquired lock once\n");
+
+    lock->Acquire();
+    printf("Acquired lock twice\n");
 }
 
-// // releasing a lock that isn't held
-// Lock *emptyLockTests = NULL;
-// void ReleaseEmptyLock() {
-// 	emptyLockTests = new Lock("empty()");
-// 	emptyLockTests->Release();
-// 	printf("releasing a lock that has not held.s\n");
-// }
+// releasing a lock that isn't held
+void testReleaseUnheldLock() {
+    Lock *lock;
+    lock = new Lock("test2");
+    lock->Release();
+	printf("Test failed.\n");
+}
 
-// // deleting a lock that is held
-// Lock *emptyLockTests = NULL;
+// deleting a lock that is held
 // void testDeleteEmptyLock() {
-//     deleteLock = new Lock("empty()");
-//     deleteLock->Acquire();
-//     delete deleteLock;
-//     printf("releasing a lock that has not held.s\n");
+//     Lock lock = new Lock("test");
+//     lock->Acquire();
+//     delete lock;
+//     printf("\n");
 // }
 
 // //waiting on a condition variable without holding a lock
@@ -186,7 +188,7 @@ ThreadTest()
     //case 2:  LockTest2();    break;
     //case 3:  LockTest3();    break;
     case 4:   testLockTwice(); break;
-   // case 4:  ReleaseEmptyLock(); break;
+    case 5:   testReleaseUnheldLock(); break;
   //  case 5:  testCondition(); break;
     default: 
 	printf("No test specified.\n");

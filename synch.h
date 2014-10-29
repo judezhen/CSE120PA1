@@ -84,9 +84,9 @@ public:
 
 private:
     char* name;				// for debugging
-    bool lockValue;
+    bool held;
     List *queue;
-    Thread *lockOnwer; 
+    Thread *lockOwner; 
     // plus some other stuff you'll need to define
 };
 
