@@ -47,7 +47,7 @@ ThreadTest1()
 }
 
 //----------------------------------------------------------------------
-// LockTest1
+// part 1 tests
 //----------------------------------------------------------------------
 
 Lock *locktest1 = NULL;
@@ -129,18 +129,96 @@ void testCondition() {
     printf("Test failed.\n");
 }
 
+/*-----------------------------------------------------
+               cv Sinal test
+______________________________________________________ */
+
+
 /* Signaling a condition variable wakes only one thread 
    and broadcasting wakes up all threads */
-// void testSignalandBroadcast() {
-//     Condition *testCondition;
-//     Lock1 = new Lock("1");
-//     Lock2 = new Lock("2");
-//     Lock3 = new Lock("3");
-//     Condition.wait(Lock1);
-//     Condition.wait(Lock2);
-//     Condition.wait(Lock3);
-//     Condition.signal();
-// }
+Condition *testCondtion_helper = new Condition("cond");
+Lock * lock = new Lock("lock1");;
+
+void testFunction1(int param){
+        printf("testing Function 1 \n");
+        lock->Acquire();
+        testCondtion_helper->Wait(lock);
+        printf("signaled Function 1\n");
+        lock->Release();
+}
+void testFunction2(int param){
+        testCondtion_helper->Signal(lock);
+        printf("testing Function 2 \n");
+        printf("signaled Function 2\n");
+}
+
+
+
+void testSignal() {
+      
+    Thread *t = new Thread("one");    
+    t->Fork(testFunction1, 0);
+
+    Thread *t2 = new Thread("two"); 
+    t2->Fork(testFunction2, 0);
+
+
+}
+
+
+/*-----------------------------------------------------
+               cv broadcast test
+______________________________________________________ */
+
+
+/* Signaling a condition variable wakes only one thread 
+   and broadcasting wakes up all threads */
+// Condition *testCondtion_helper = new Condition("cond");
+// Lock * lock = new Lock("lock1");;
+
+Condition *testCondtion_helper1 = new Condition("cond1");
+Lock * lock1 = new Lock("lock1");;
+
+
+void testFun1(int param){   
+    lock1->Acquire();  
+        printf("testing Function 1 \n");
+        testCondtion_helper1->Wait(lock1);
+        
+        printf("broadcast Function 1\n");
+
+}
+void testFun2(int param){
+    lock1->Acquire();  
+         printf("testing Function 2 \n");
+        testCondtion_helper1->Wait(lock1);
+        
+        printf("signaled Function 2\n");
+  }
+
+void testFun3 (int param){
+        printf("testing Function 3\n");
+        testCondtion_helper1->Broadcast(lock1);
+     
+        printf("signaled Function 3\n");       
+}
+void testBroadcast() {
+    Thread *t = new Thread("one");  
+    t->Fork(testFun1, 0);
+    t = new Thread("two"); 
+    t->Fork(testFun2, 0);
+    t = new Thread("three"); 
+    t->Fork(testFun3, 0);
+}
+
+
+
+
+
+
+
+
+
 // signaling and broadcasting to a condition variable with no waiters is a no-op, 
 // and future threads that wait will block (i.e., the signal/broadcast is "lost")
 // void testNoOp() {
@@ -190,7 +268,9 @@ ThreadTest()
     //case 3:  LockTest3();    break;
     case 4:   testLockTwice(); break;
     case 5:   testReleaseUnheldLock(); break;
-    case 6:  testCondition(); break;
+    case 6:   testCondition(); break;
+    case 7:   testSignal(); break;
+    case 8:   testBroadcast(); break;
     default: 
 	printf("No test specified.\n");
 	break;

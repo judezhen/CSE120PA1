@@ -119,7 +119,7 @@ bool Lock::isHeldByCurrentThread() {
 
 void Lock::Acquire(){ 
 
-    ASSERT(!isHeldByCurrentThread());
+  //  ASSERT(!isHeldByCurrentThread());
 
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
 
@@ -136,7 +136,8 @@ void Lock::Acquire(){
 
 
 void Lock::Release() {
-    ASSERT(isHeldByCurrentThread());
+    
+   // ASSERT(isHeldByCurrentThread());
     
     Thread *thread; 
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
@@ -162,6 +163,7 @@ Condition::~Condition() {
 }
 
 void Condition::Wait(Lock* conditionLock) {
+   
     ASSERT(conditionLock->isHeldByCurrentThread());
     
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
@@ -174,8 +176,8 @@ void Condition::Wait(Lock* conditionLock) {
 
 void Condition::Signal(Lock* conditionLock) { 
     
-    Thread *thread;
-    // ASSERT(conditionLock->isHeldByCurrentThread());
+     Thread *thread;
+     ASSERT(!conditionLock->isHeldByCurrentThread());
    
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
     thread = (Thread *)waitingQueue->Remove();
@@ -188,16 +190,16 @@ void Condition::Signal(Lock* conditionLock) {
 void Condition::Broadcast(Lock* conditionLock) { 
 
     Thread *thread;
-    // ASSERT(conditionLock->isHeldByCurrentThread());
+    ASSERT(!conditionLock->isHeldByCurrentThread());
     IntStatus oldLevel = interrupt->SetLevel(IntOff);
     thread = (Thread *)waitingQueue->Remove();
+
     // wake up all the threads
     while(thread != NULL) {
         scheduler->ReadyToRun(thread);
         thread = (Thread *)waitingQueue->Remove();
     }
     (void) interrupt->SetLevel(oldLevel);
-
 }
 
 // MailBox for part 2

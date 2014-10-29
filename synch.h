@@ -137,7 +137,7 @@ public:
     // *atomic* in Wait()
     void Signal(Lock *conditionLock);   // conditionLock must be held by
     void Broadcast(Lock *conditionLock);// the currentThread for all of
-    // these operations
+                                         // these operations
 
 private:
     char* name;
