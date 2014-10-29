@@ -73,7 +73,12 @@ void testReleaseUnheldLock() {
 }
 
 // deleting a lock that is held
-void testDeleteEmptyLock() { }
+void testDeleteEmptyLock() {
+    Lock *lock;
+    lock = new Lock("test3");
+    lock->Acquire();
+    delete lock;
+}
 
 
 //waiting on a condition variable without holding a lock
