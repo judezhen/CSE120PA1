@@ -64,6 +64,7 @@ void testLockTwice()
     printf("Acquired lock twice\n");
 }
 
+
 // releasing a lock that isn't held
 void testReleaseUnheldLock() {
     Lock *lock;
@@ -72,12 +73,16 @@ void testReleaseUnheldLock() {
 	printf("Test failed.\n");
 }
 
+
 // deleting a lock that is held
 void testDeleteEmptyLock() {
     Lock *lock;
     lock = new Lock("test3");
     lock->Acquire();
     delete lock;
+    printf("Checking if lock still exists...\n");
+    lock->Release();
+    printf("Lock still exists.\n");
 }
 
 
@@ -169,7 +174,7 @@ Condition *testCond = NULL;
 void testWait(int param) {
     testLock->Acquire();
     testCond->Wait(testLock);
-    printf("Block unsuccessful.");
+    printf("Block unsuccessful.\n");
     //test that thread "one" is in the queue
 }
 void testNoOp() {
@@ -204,8 +209,9 @@ void testSignalHoldLock() {
 /*  deleting a lock or condition variable should have no threads on 
     the wait queue
 */
-
-void testDeleteLockCVNoThreads() {}
+void testDeleteLockCVNoThreads() {
+    
+}
 
 //----------------------------------------------------------------------
 // END PART 1 TESTING CODE
@@ -260,11 +266,12 @@ ThreadTest()
     switch (testnum) {
     case 1: testLockTwice(); break;
     case 2: testReleaseUnheldLock(); break;
-    case 3: testCondition(); break;
-    case 4: testSignal(); break;
-    case 5: testBroadcast(); break;
-    case 6: testNoOp(); break;
-    case 7: testSignalHoldLock(); break;
+    case 3: testDeleteEmptyLock(); break;
+    case 4: testCondition(); break;
+    case 5: testSignal(); break;
+    case 6: testBroadcast(); break;
+    case 7: testNoOp(); break;
+    case 8: testSignalHoldLock(); break;
     default: 
 	printf("No test specified.\n");
 	break;

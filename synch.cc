@@ -111,8 +111,7 @@ Lock::Lock(char* debugName) {
 
 Lock::~Lock() {
     if (held == true) {
-        printf("NOOOOOOOO, do NOT delete me.!");
-        break;
+        return;
     }
     delete queue;
 }
