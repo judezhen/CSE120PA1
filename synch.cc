@@ -110,6 +110,10 @@ Lock::Lock(char* debugName) {
 }
 
 Lock::~Lock() {
+    if (held == true) {
+        printf("NOOOOOOOO, do NOT delete me.!");
+        break;
+    }
     delete queue;
 }
 
@@ -202,66 +206,38 @@ void Condition::Broadcast(Lock* conditionLock) {
     (void) interrupt->SetLevel(oldLevel);
 }
 
-// MailBox for part 2
-// not working
-// constructors
-// Mailbox::Mailbox(char* debugName){   
 
-//     name = debugName;
-//     meet = Condition();
-//     Sender = new  Condition();
-//     receive = new Condition();
-//     lock = new Lock();
-//     msg = new List<>;
+MailBox::MailBox()
+{
+    lock = new Lock("mailbox");
+    send_msg = new Condition("MailBox_send");
+    receive_msg = new Condition("MailBox_receive");
+}
 
-//     // receiver = new Semaphore("receiver", 0);
-//     // sender = new Semaphore("sender", 0);
-//     // same = new Semaphore("same", 0);
-//     // lock = new Lock("lock");
-//     // msg = new List();
-// }
+MailBox::~MailBox()
+{
+    delete send_msg;
+    delete receive_msg;
+    delete lock;
+}
 
-// Mailbox::~Mailbox(){
-//     // delete receiver;
-//     // delete sender;
-//     // delete same;
-//     // delete lock;
-//     // delete msg;
-    
-// }
+void MailBox::Send(int message)
+{
+    lock->Acquire();
+    send_msg->Wait(lock);
+    msg->Append((void *)message);
+    receive_msg->Signal(lock);
+    lock->Release();
+}
 
-// void Mailbox::Send(int message){   
-//   // // if the receiver receives a message, wake up  sender;
-//   // sender->V();
-//   // //receiver wait until the sender sends a msg;
-//   // receiver->P();
-
-//   // lock->Acquire();
-//   // msg->Append((int *)message);
-//   // lock->Release();
-
-//   // same->V();
-
-//   // sender->V();
-//   // receiver->P();
-
-// }
-
-// void Mailbox::Receive(int *message){
-    
-//     // receiver->V();
-//     // sender->P();
-//     // same->P();
-
-//     // lock->Acquire();
-//     // message = (int * )msg->Remove();
-//     // lock->Release();
-
-//     // receiver->V();
-//     // sender->P();
-
-// }
-
+void MailBox::Receive(int *message)
+{
+    lock->Acquire();
+    receive_msg->Wait(lock);
+    *message = (int) (msg->Remove());
+    send_msg->Signal(lock);
+    lock->Release();
+}
 
 
 

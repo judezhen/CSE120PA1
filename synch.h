@@ -145,31 +145,17 @@ private:
     // plus some other stuff you'll need to define
 };
 
-// class Mailbox{
-// public:
-//     Mailbox(char *debugName);
-//     ~Mailbox();
-
-//     char *getName(){
-//         return name;
-//     }
-
-//     // public function
-//     void Send(int message);
-//     void Receive(int * message);
-
-//     // private variables
-// private:
-//     char *name;             // name for debuge    
-//     // Semaphore *receiver;    //receiving a message;
-//     // Semaphore *sender;      //sending a message;
-//     // Semaphore *same;        // reciver and sender are same
-//     // Lock *lock;             //lock for r/w ;
-//     // List *msg;              // message box;
-//     Condition *meet;
-//     Condition *Sender;
-//     Condition *Receive;
-//     Lock *lock ;
-// };
+class MailBox {
+public:
+    MailBox();
+    ~MailBox();
+    void Send(int message);
+    void Receive(int *message);
+private:
+    Condition *send_msg;
+    Condition *receive_msg;
+    Lock *lock;
+    List *msg;
+};
 
 #endif // SYNCH_H
