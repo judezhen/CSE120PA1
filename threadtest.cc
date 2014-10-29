@@ -121,12 +121,13 @@ void testReleaseUnheldLock() {
 //     printf("\n");
 // }
 
-// //waiting on a condition variable without holding a lock
-// void testCondition() {
-//     Condition *testCondition;
-//     testCondition.wait();
-//     printf("waiting on the.....\n");
-// }
+//waiting on a condition variable without holding a lock
+void testCondition() {
+    Condition *testCondition = new Condition("ctest");
+    Lock *lock = new Lock("ltest");
+    testCondition->Wait(lock);
+    printf("Test failed.\n");
+}
 
 /* Signaling a condition variable wakes only one thread 
    and broadcasting wakes up all threads */
@@ -189,7 +190,7 @@ ThreadTest()
     //case 3:  LockTest3();    break;
     case 4:   testLockTwice(); break;
     case 5:   testReleaseUnheldLock(); break;
-  //  case 5:  testCondition(); break;
+    case 6:  testCondition(); break;
     default: 
 	printf("No test specified.\n");
 	break;

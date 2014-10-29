@@ -154,48 +154,49 @@ void Lock::Release() {
 
 
 Condition::Condition(char* debugName) {
-    // name = debugName;
-    // waitingQueue = new List;
+    name = debugName;
+    waitingQueue = new List;
  }
 Condition::~Condition() { 
     delete waitingQueue;
 }
 
 void Condition::Wait(Lock* conditionLock) {
-    // IntStatus oldLevel = interrupt->SetLevel(IntOff);
-    // ASSERT(conditionLock->isHeldByCurrentThread());
-    // conditionLock->Release(); 
-    // waitingQueue->Append((void *)currentThread); 
-    // currentThread->Sleep();
-    // conditionLock->Acquire();
-    // (void) interrupt->SetLevel(oldLevel);
+    ASSERT(conditionLock->isHeldByCurrentThread());
+    
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    conditionLock->Release(); 
+    waitingQueue->Append((void *)currentThread); 
+    currentThread->Sleep();
+    conditionLock->Acquire();
+    (void) interrupt->SetLevel(oldLevel);
 }
 
 void Condition::Signal(Lock* conditionLock) { 
     
-    // Thread *thread;
+    Thread *thread;
     // ASSERT(conditionLock->isHeldByCurrentThread());
    
-    // IntStatus oldLevel = interrupt->SetLevel(IntOff);
-    // thread = (Thread *)waitingQueue->Remove();
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    thread = (Thread *)waitingQueue->Remove();
     
-    // if(thread != NULL) 
-    //     scheduler->ReadyToRun(thread);
-    // (void) interrupt->SetLevel(oldLevel);
+    if(thread != NULL) 
+        scheduler->ReadyToRun(thread);
+    (void) interrupt->SetLevel(oldLevel);
 }
 
 void Condition::Broadcast(Lock* conditionLock) { 
 
-    // Thread *thread;
+    Thread *thread;
     // ASSERT(conditionLock->isHeldByCurrentThread());
-    // IntStatus oldLevel = interrupt->SetLevel(IntOff);
-    // thread = (Thread *)waitingQueue->Remove();
-    // // wake up all the threads
-    // while(thread != NULL) {
-    //     scheduler->ReadyToRun(thread);
-    //     thread = (Thread *)waitingQueue->Remove();
-    // }
-    // (void) interrupt->SetLevel(oldLevel);
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);
+    thread = (Thread *)waitingQueue->Remove();
+    // wake up all the threads
+    while(thread != NULL) {
+        scheduler->ReadyToRun(thread);
+        thread = (Thread *)waitingQueue->Remove();
+    }
+    (void) interrupt->SetLevel(oldLevel);
 
 }
 
