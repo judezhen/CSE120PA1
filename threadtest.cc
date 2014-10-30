@@ -221,19 +221,93 @@ void testDeleteLockCVNoThreads() {
 //------------------------------------------------------------------------
 // BEGIN PART 2 TESTING CODE
 //------------------------------------------------------------------------
-// Mailbox *Mailboxtest = NULL;
+Mailbox *mBox = NULL;
+Thread *t = NULL;
+int *msg = NULL;
 
-// void MailboxTest() {
-   
-//     DEBUG('t', "Entering Mailboxtest");
+void sendBlock(int param) {
+    mBox->Send(1);
+    printf("Wasn't blocked.\n"); //shouldn't print
+}
+void receiveBlock(int param) {
+    mBox->Receive(msg);
+    printf("Wasn't blocked.\n"); //shouldn't print
+}
+void send1(int param) {
+    mBox->Send(1);
+}
+void send2(int param) {
+    mBox->Send(2);
+}
+void receive(int param) {
+    mBox->Receive(msg);
+}
 
-//     Mailboxtest = new Mailbox();
-//     Mailboxtest->Send(1);
-//     int in = Mailboxtest->Receive();
-//     printf("what is in the mailbox : %d \n ", in);
+/*
+a receiver will only return when a sender sends, and blocks otherwise 
+(and vice-versa); 
+*/
+void testSendBlock() {
+    mBox = new Mailbox();
+    t = new Thread("one");
+    t->Fork(sendBlock,0);
+}
+void testReceiveBlock() {
+    mBox = new Mailbox();
+    t = new Thread("one");
+    t->Fork(receiveBlock,0);
+}
+void testSendReceive() {
+    mBox = new Mailbox();
+    t = new Thread("one");
+    t->Fork(send1,0);
+    t = new Thread("two");
+    t->Fork(receive,0);
+    ASSERT(*msg==1);
+    t = new Thread("three");
+    t->Fork(receive,0);
+    t = new Thread("four");
+    t->Fork(send2,0);
+    ASSERT(*msg==2);
+}
 
-//     delete Mailboxtest;
-// }
+/*
+only one receiver and sender synchronize at a time, even when there 
+are multiple senders and receivers.
+
+Explanation:
+We send two receivers first, and three senders afterwards. We should
+see the print messages of the email msg when the first two sends return.
+The third send should be blocked, since it is without a pair, and
+we should not see the print message in its function.
+*/
+void send1Return(int param) {
+    mBox->Send(1);
+    printf("Returned with %d\n", *msg);
+}
+void send2Return(int param) {
+    mBox->Send(2);
+    printf("Returned with %d\n", *msg);
+}
+void send3Block(int param) {
+    mBox->Send(3);
+    printf("Wasn't blocked.\n");
+}
+
+void testMultiBox() {
+    mBox = new Mailbox();
+    t = new Thread("one");
+    t->Fork(receive,0);
+    t = new Thread("two");
+    t->Fork(receive,0);
+    t = new Thread("three");
+    t->Fork(send1Return,0);
+    t = new Thread("four");
+    t->Fork(send2Return,0);
+    t = new Thread("five");
+    t->Fork(send3Block,0);
+}
+
 
 //------------------------------------------------------------------------
 // END PART 2 TESTING CODE
@@ -272,7 +346,12 @@ ThreadTest()
     case 6: testBroadcast(); break;
     case 7: testNoOp(); break;
     case 8: testSignalHoldLock(); break;
-    default: 
+    case 9: testSendBlock(); break;
+    case 10: testReceiveBlock(); break;
+    case 11: testSendReceive(); break;
+    case 12: testMultiBox(); break;
+
+    default:
 	printf("No test specified.\n");
 	break;
     }

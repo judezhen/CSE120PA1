@@ -206,22 +206,19 @@ void Condition::Broadcast(Lock* conditionLock) {
 }
 
 
-MailBox::MailBox()
-{
-    lock = new Lock("mailbox");
-    send_msg = new Condition("MailBox_send");
-    receive_msg = new Condition("MailBox_receive");
+Mailbox::Mailbox() {
+    lock = new Lock("Mailbox_lock");
+    send_msg = new Condition("Mailbox_send");
+    receive_msg = new Condition("Mailbox_receive");
 }
 
-MailBox::~MailBox()
-{
+Mailbox::~Mailbox() {
     delete send_msg;
     delete receive_msg;
     delete lock;
 }
 
-void MailBox::Send(int message)
-{
+void Mailbox::Send(int message) {
     lock->Acquire();
     send_msg->Wait(lock);
     msg->Append((void *)message);
@@ -229,35 +226,10 @@ void MailBox::Send(int message)
     lock->Release();
 }
 
-void MailBox::Receive(int *message)
-{
+void Mailbox::Receive(int *message) {
     lock->Acquire();
     receive_msg->Wait(lock);
     *message = (int) (msg->Remove());
     send_msg->Signal(lock);
     lock->Release();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
